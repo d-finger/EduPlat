@@ -26,6 +26,8 @@ public class LogInFrame extends javax.swing.JFrame {
      * Creates new form LogInFrame
      */
     public static AdminUser adminuser=null;
+    public static StudentUser studentlogin=null;
+    public static TeacherUser teacherlogin=null;
     public LogInFrame() {
         initComponents();
     }
@@ -64,7 +66,6 @@ public class LogInFrame extends javax.swing.JFrame {
         jRadioButton2.setSelected(true);
         jRadioButton2.setContentAreaFilled(false);
         jRadioButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jRadioButton2.setDisabledSelectedIcon(null);
         jRadioButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/dkkcorp/Untitled-1.png"))); // NOI18N
         jRadioButton2.setNextFocusableComponent(jRadioButton3);
         jRadioButton2.addItemListener(new java.awt.event.ItemListener() {
@@ -112,6 +113,11 @@ public class LogInFrame extends javax.swing.JFrame {
         jTextField1.setBorder(null);
         jTextField1.setNextFocusableComponent(jPasswordField1);
         jTextField1.setOpaque(false);
+        jTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTextField1FocusGained(evt);
+            }
+        });
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
@@ -124,6 +130,11 @@ public class LogInFrame extends javax.swing.JFrame {
         jPasswordField1.setBorder(null);
         jPasswordField1.setNextFocusableComponent(jButton1);
         jPasswordField1.setOpaque(false);
+        jPasswordField1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jPasswordField1FocusGained(evt);
+            }
+        });
         getContentPane().add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 180, 220, 40));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/dkkcorp/loginBtn.png"))); // NOI18N
@@ -185,6 +196,7 @@ public class LogInFrame extends javax.swing.JFrame {
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
@@ -196,8 +208,8 @@ public class LogInFrame extends javax.swing.JFrame {
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
         // TODO add your handling code here:
-        String dbname="",dblastname="" ,dbusernam="",dbemail="",dbpassword="",dbstudentid="",dbprogrammeosstudy="",dbadmisiondate="",dbclassenrolled="",dbcours="";
-        int dbpermision=0, dbid=0;
+        String dbname="",dblastname="" ,dbusernam="",dbemail="",dbpassword="",dbstudentid="",dbprogrammeosstudy="",dbclassenrolled="",dbcours="",dbteacherid="";
+        int dbpermision=0, dbid=0,dbadmisiondate=0;
         String usernam=jTextField1.getText();
         Connection myConn = null;
 	Statement myStmt = null;
@@ -221,6 +233,7 @@ public class LogInFrame extends javax.swing.JFrame {
             while (myRs.next()) {
                 if(categories=="student")
                 {
+                    //assinging db value find to each variABLE
                     dbid=Integer.parseInt(myRs.getString("Id"));
                     dbusernam=myRs.getString("UserName");
                     dbpassword=myRs.getString("Password");
@@ -229,7 +242,7 @@ public class LogInFrame extends javax.swing.JFrame {
                     dbemail=myRs.getString("Email");
                     dbstudentid=myRs.getString("StudentId");
                     dbprogrammeosstudy=myRs.getString("ProgrammeOsStudy");
-                    dbadmisiondate=myRs.getString("AdmisionDate");
+                    dbadmisiondate=Integer.parseInt(myRs.getString("AdmisionDate"));
                     dbclassenrolled=myRs.getString("ClassEnrolled");
                     dbpermision=Integer.parseInt(myRs.getString("Permision"));
                     
@@ -242,6 +255,7 @@ public class LogInFrame extends javax.swing.JFrame {
                     dbemail=myRs.getString("Email");
                     dbusernam=myRs.getString("UserName");
                     dbpassword=myRs.getString("Password");
+                    dbteacherid=myRs.getString("TeacherId");
                     dbcours=myRs.getString("Cours");
                     dbpermision=Integer.parseInt(myRs.getString("Permision"));
                 }
@@ -284,45 +298,48 @@ public class LogInFrame extends javax.swing.JFrame {
                             }
 			}
 		}
-	
+	//getting password value from password field of the frame
         String password="";
         char []passarray=jPasswordField1.getPassword();
         int i=0;
         for(i=0;i<jPasswordField1.getPassword().length;i++){
             password = password+String.valueOf(passarray[i]);
         }
-        if((usernam.equalsIgnoreCase(dbusernam) && password.equals(dbpassword))&&usernam!="")
+        if(!usernam.isEmpty() && (usernam.equalsIgnoreCase(dbusernam) && password.equals(dbpassword)))
         {if(categories=="student")
-                {
-                    /*dbid=Integer.parseInt(myRs.getString("Id"));
-                    dbusernam=myRs.getString("UserName");
-                    dbpassword=myRs.getString("Password");
-                    dbname=myRs.getString("Name");
-                    dblastname=myRs.getString("LastName");
-                    dbemail=myRs.getString("Email");
-                    dbstudentid=myRs.getString("StudentId");
-                    dbprogrammeosstudy=myRs.getString("ProgrammeOsStudy");
-                    dbadmisiondate=myRs.getString("AdmisionDate");
-                    dbclassenrolled=myRs.getString("ClassEnrolled");
-                    dbpermision=Integer.parseInt(myRs.getString("Permision"));
-                    */
+                {     
+                    //creat a new static object student when the login is correct
+                    studentlogin= new StudentUser(dbid,dbname,dblastname,dbusernam,dbemail,dbpassword,dbpermision,dbstudentid,dbprogrammeosstudy,dbclassenrolled,dbadmisiondate);
+                   //go to the interface for student user
+                   
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                     public void run() {
+                    new StudentFrame_Home().setVisible(true);
+                    }
+                    });
+                    //set login form invisible
+                    this.setVisible(false);
                     
                 }
                 else if(categories=="teacher")
                 {
-                   /* dbid=Integer.parseInt(myRs.getString("Id"));
-                    dbname=myRs.getString("Name");
-                    dblastname=myRs.getString("LastName");
-                    dbemail=myRs.getString("Email");
-                    dbusernam=myRs.getString("UserName");
-                    dbpassword=myRs.getString("Password");
-                    dbcours=myRs.getString("Cours");
-                    dbpermision=Integer.parseInt(myRs.getString("Permision"));
-                    */
+                     //creat a new static object student when the login is correct
+                    teacherlogin = new TeacherUser(dbid,dbname,dblastname,dbusernam,dbemail,dbpassword,dbpermision,dbteacherid,dbcours);
+                   //go to the interface for teacher user
+                   
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                     public void run() {
+                    new TeacherFrame_Home().setVisible(true);
+                    }
+                    });
+                    //set login form invisible
+                    this.setVisible(false);
+                   
                 }
                 else{
+                    //creat a new static object admin when the login is correct
                     adminuser= new AdminUser(dbid,dbname,dblastname,dbusernam,dbemail,dbpassword,dbpermision);
-                   
+                   //go to the interface for admin user
                     java.awt.EventQueue.invokeLater(new Runnable() {
                      public void run() {
                     new AdminFrame1().setVisible(true);
@@ -340,6 +357,18 @@ public class LogInFrame extends javax.swing.JFrame {
             jLabel3.setText("incorrect. Please Try again");
         }
     }//GEN-LAST:event_jButton1MouseClicked
+
+    private void jTextField1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField1FocusGained
+         // when the username textfield gain focus, remove login error message
+        jLabel2.setVisible(false);
+            jLabel3.setVisible(false);
+    }//GEN-LAST:event_jTextField1FocusGained
+
+    private void jPasswordField1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jPasswordField1FocusGained
+        // when the password textfield gain focus, remove login error message
+        jLabel2.setVisible(false);
+            jLabel3.setVisible(false);
+    }//GEN-LAST:event_jPasswordField1FocusGained
 
     /**
      * @param args the command line arguments
